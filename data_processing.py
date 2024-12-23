@@ -1,16 +1,5 @@
 # import the libraries
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split
-import plotly.express as px
-import plotly.graph_objects as go
-from scipy.stats import gaussian_kde, skew, kurtosis
-
-# For exploring missing values
-import missingno as msno
 
 def missing_values_processing(df):
     # Drop columns with more than 50% missing values
@@ -48,7 +37,6 @@ def missing_values_processing(df):
 
 def features_engineering(df):
     ### Create a new feature 'FireplaceFeature' based on 'Fireplaces' and 'FireplaceQu'
-
     # Map 'FireplaceQu' to numerical scores
     quality_mapping = {
         "Ex": 5,
@@ -58,12 +46,28 @@ def features_engineering(df):
         "Po": 1,
         "No": 0  # Missing values or no fireplace
     }
-
     df['FireplaceQu'] = df['FireplaceQu'].fillna("No")
     df['FireplaceQu_Score'] = df['FireplaceQu'].map(quality_mapping)
     df['FireplaceFeature'] = df['Fireplaces'] * df['FireplaceQu_Score']
-    df.drop(columns=['FireplaceQu', 'Fireplaces', 'FireplaceQu_Score'], inplace=True)
+ 
+    
+    ### Garage features
+    df['GarageCapacityScore'] = df['GarageCars'] * df['GarageArea']
+    
 
+    ### Create Total Size feature
+    df['TotalSize'] = df['TotalBsmtSF'] + df['1stFlrSF'] + df['2ndFlrSF']
+  
+    
+    #### Create the `BasementUtilityScore` feature
+    df['BasementUtilityScore'] = df['BsmtFinSF1'] * df['BsmtFullBath']
+    
+    ### Drop the original features
+    df.drop(columns=['FireplaceQu', 'Fireplaces', 'TotalBsmtSF', 
+                     '1stFlrSF', '2ndFlrSF', 'GarageArea', 'GarageCars', 
+                     'TotRmsAbvGrd', 'GrLivArea', 'BsmtFinSF1', 'BsmtFullBath'], 
+                     inplace=True)
+    
     return df
 
 
@@ -75,11 +79,12 @@ if __name__ == "__main__":
     print("Shape of the intial dataset: ", df.shape)
  
     print("Missing values processing...")
-    df = missing_values_processing(df)
-   
+    df_no_na = missing_values_processing(df)
+    print("Shape of the dataset without missing values: ", df_no_na.shape)
+    
     print("Features engineering...")
-    df = features_engineering(df)
-
-    print("Shape of the processed dataset: ", df.shape)
+    df_new_feat = features_engineering(df_no_na)
+    print("Shape of the dataset with new features: ", df_new_feat.shape)
+    
     # Save the processed dataset
     df.to_csv('data/processed_data/train_processed.csv', index=False)
