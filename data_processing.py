@@ -74,7 +74,7 @@ def features_engineering(df):
 if __name__ == "__main__":
     # Load the dataset
     df = pd.read_csv('data/train.csv')
-
+    df = df.set_index('Id')
     # Data processing
     print("Shape of the intial dataset: ", df.shape)
  
@@ -87,4 +87,20 @@ if __name__ == "__main__":
     print("Shape of the dataset with new features: ", df_new_feat.shape)
     
     # Save the processed dataset
-    df.to_csv('data/processed_data/train_processed.csv', index=False)
+    df_new_feat.to_csv('data/train_processed.csv', index=False)
+
+    df2 = pd.read_csv('data/test.csv')
+    df2 = df2.set_index('Id')
+    # Data processing
+    print("Shape of the initial dataset: ", df2.shape)
+
+    print("Missing values processing...")
+    df2_no_na = missing_values_processing(df2)
+    print("Shape of the dataset without missing values: ", df2_no_na.shape)
+
+    print("Features engineering...")
+    df2_new_feat = features_engineering(df2_no_na)
+    print("Shape of the dataset with new features: ", df2_new_feat.shape)
+
+    # Save the processed dataset
+    df2_new_feat.to_csv('data/test_processed.csv', index=False)
