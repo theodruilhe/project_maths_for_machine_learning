@@ -82,4 +82,4 @@ if __name__ == "__main__":
 
     print("Shape of the processed dataset: ", df.shape)
     # Save the processed dataset
-    df.to_csv('data/train_processed.csv', index=False)
+    df.to_csv('data/processed_data/train_processed.csv', index=False)
